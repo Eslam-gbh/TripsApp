@@ -45,6 +45,10 @@ Rails.application.configure do
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 
+  # Activate action caching
+  config.cache_store = :mem_cache_store, "localhost"
+  config.action_controller.perform_caching = true
+
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 

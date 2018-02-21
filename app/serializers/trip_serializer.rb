@@ -1,3 +1,4 @@
 class TripSerializer < ActiveModel::Serializer
-  attributes :id, :driver
+  cache key: 'trip'
+  attributes :id, :driver, :location
 end
