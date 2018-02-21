@@ -13,24 +13,28 @@ module Api
       # GET api/vapi/v1/trips
       def index
         trips = Trip.order('created_at DESC');
-        render json: {status: 'SUCCESS', message:'Loaded trips', data:trips}, status: :ok
+        # serialized json
+        render json: trips, status: :ok, each_serializer: TripSerializer
       end
 
       # GET api/v1/trips/1
       def show
         trip = Trip.find(params[:id])
-        render json: {status: 'SUCCESS', message:'Loaded trip', data:trip},status: :ok
+        # serialized json
+        render json: trip,status: :ok
       end
 
       # POST api/v1/trips
       def create
         t_params = trip_params
+        # convert location string to array format for future appending
         t_params["location"] = convert_location(t_params["location"])
         trip = Trip.new(t_params)
         if not validate_state(t_params,trip)
           render json: {status: 'ERROR', message:'Trip not saved', data:trip.errors},status: :not_valid_state
         elsif trip.save
-          render json: {status: 'SUCCESS', message:'Saved trip', data:trip},status: :ok
+          # serialized json
+          render json: trip,status: :ok
         else
           render json: {status: 'ERROR', message:'Trip not saved', data:trip.errors},status: :unprocessable_entity
         end
@@ -54,9 +58,10 @@ module Api
             status: 'ERROR',
             message:'Trip not updated duo to not valid state submission',
             data:trip.errors
-          },status: :not_valid_state
+          },status: :unprocessable_entity
         elsif trip.update_attributes(t_params)
-          render json: {status: 'SUCCESS', message:'Updated trip', data:trip},status: :ok
+          # serialized json
+          render json: trip,status: :ok
         else
           render json: {status: 'ERROR', message:'Trip not updated', data:trip.errors},status: :unprocessable_entity
         end
@@ -83,6 +88,8 @@ module Api
           state = t_params["state"]
           if (not t_params["start_at"].nil?) && (not t_params["completed_at"].nil?)  && (t_params["start_at"] >= t_params["completed_at"])
             return false
+          elsif (not STATUSES.include? state)
+          return false
           elsif (not trip.state.nil?) && (STATUSES.index(state) < STATUSES.index(trip.state))
             return false
           else
