@@ -14,7 +14,7 @@ STATUSES = [
 5.times do
   Trip.create({
       driver: Faker::Name.name,
-      location: Faker::Address.street_name,
+      location: [Faker::Address.street_name],
       start_at: Faker::Time.backward(14, :evening),
       completed_at: Faker::Time.forward(23, :morning),
       state: STATUSES.sample
