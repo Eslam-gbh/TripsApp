@@ -31,10 +31,14 @@ module Api
         t_params["location"] = convert_location(t_params["location"])
         trip = Trip.new(t_params)
         if not validate_state(t_params,trip)
-          render json: {status: 'ERROR', message:'Trip not saved', data:trip.errors},status: :not_valid_state
+          render json: {
+            status: 'ERROR',
+            message:'Trip not saved due to invalid state submission',
+            data:trip.errors},
+            status: :unprocessable_entity
         elsif trip.save
           # serialized json
-          render json: trip,status: :ok
+          render json: trip,status: :created
         else
           render json: {status: 'ERROR', message:'Trip not saved', data:trip.errors},status: :unprocessable_entity
         end
@@ -56,7 +60,7 @@ module Api
         if not validate_state(t_params,trip)
           render json: {
             status: 'ERROR',
-            message:'Trip not updated duo to not valid state submission',
+            message:'Trip not updated due to invalid state submission',
             data:trip.errors
           },status: :unprocessable_entity
         elsif trip.update_attributes(t_params)
@@ -88,9 +92,11 @@ module Api
           state = t_params["state"]
           if (not t_params["start_at"].nil?) && (not t_params["completed_at"].nil?)  && (t_params["start_at"] >= t_params["completed_at"])
             return false
+          elsif (state.nil?) || (trip.state.nil?)
+            return false
           elsif (not STATUSES.include? state)
-          return false
-          elsif (not trip.state.nil?) && (STATUSES.index(state) < STATUSES.index(trip.state))
+            return false
+          elsif (STATUSES.index(state) < STATUSES.index(trip.state))
             return false
           else
             return true
