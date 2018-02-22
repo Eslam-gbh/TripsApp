@@ -31,10 +31,12 @@ module Api
         t_params["location"] = convert_location(t_params["location"])
         trip = Trip.new(t_params)
         if not validate_state(t_params,trip)
-          render json: {
-            status: 'ERROR',
-            message:'Trip not saved due to invalid state submission',
-            data:trip.errors},
+          render \
+            json: {
+              status: 'ERROR',
+              message:'Trip not saved due to invalid state submission',
+              data:trip.errors
+            },
             status: :unprocessable_entity
         elsif trip.save
           # serialized json
@@ -58,17 +60,31 @@ module Api
         t_params["location"] = append_location(t_params["location"], trip)
 
         if not validate_state(t_params,trip)
-          render json: {
-            status: 'ERROR',
-            message:'Trip not updated due to invalid state submission',
-            data:trip.errors
-          },status: :unprocessable_entity
+          render \
+            json: {
+              status: 'ERROR',
+              message:'Trip not updated due to invalid state submission',
+              data:trip.errors
+            },
+            status: :unprocessable_entity
         elsif trip.update_attributes(t_params)
           # serialized json
           render json: trip,status: :ok
         else
-          render json: {status: 'ERROR', message:'Trip not updated', data:trip.errors},status: :unprocessable_entity
+          render \
+            json: {status: 'ERROR', message:'Trip not updated', data:trip.errors},
+            status: :unprocessable_entity
         end
+      end
+
+      # Get /trips/report
+      # Simple report worker
+      def report
+        # generate_report()
+        ReportWorker.perform_async("07-01-2018", "08-01-2018")
+        render \
+          json: {status: 'SUCCESS', message:'REQUEST TO GENERATE A REPORT ADDED TO THE QUEUE'},
+          status: :ok
       end
 
       private
