@@ -4,7 +4,6 @@ describe 'POST /api/v1/trips' do
   before {
     post '/api/v1/trips',
     params: { :driver => "test_driver", :state => "ongoing" }
-    # headers: { 'Accept': 'application/vnd', 'Content-Type': 'application/vnd.api+json' }
 }
 
   it 'returns the driver name' do
