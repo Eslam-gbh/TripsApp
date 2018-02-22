@@ -4,14 +4,14 @@ describe 'POST /api/v1/trips' do
   before {
     post '/api/v1/trips',
     params: { :driver => "test_driver", :state => "ongoing" }
-}
+  }
 
   it 'returns the driver name' do
     body = JSON.parse(response.body)['data']['attributes']
     expect(body['driver']).to eq('test_driver')
   end
 
-  it 'returns the quote content' do
+  it 'returns the trip state' do
     body = JSON.parse(response.body)['data']['attributes']
     expect(body['state']).to eq('ongoing')
   end
