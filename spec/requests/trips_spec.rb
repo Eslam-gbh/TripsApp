@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe 'GET /api/v1/trips' do
   let!(:trips) { FactoryBot.create_list(:trip, 10) }
 
